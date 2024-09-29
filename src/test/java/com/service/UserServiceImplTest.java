@@ -117,7 +117,7 @@ public class UserServiceImplTest {
     public void testSaveUserAlreadyCreated() {
         // Arrange
         User user = new User("UserName", "user@email.cl","Password12$",new Phone(12L,12,12345678),"qwerwqerwqer");
-        userRepository.save(user);
+        when(userRepository.save(user)).thenReturn(user);
 
         // Act
         UserInn userInn = new UserInn("UserName","user@email.cl","Password12$",new Phone(12L,12,12345678));
