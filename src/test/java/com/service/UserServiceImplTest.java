@@ -144,4 +144,15 @@ public class UserServiceImplTest {
         assertFalse(resultinvalid2);
 
     }
+    @Test
+    public void testGenerateValidateToken() {
+        //Arrange
+        String userName="username";
+        //Act
+        String token=userService.generateJWTToken(userName);
+        String userValidated=userService.validateJWTToken(token);
+        //Assert
+        assertTrue(userName.equalsIgnoreCase(userValidated));
+
+    }
 }

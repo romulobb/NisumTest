@@ -1,5 +1,8 @@
 package com.controllers;
 
+import com.error.InvalidMailException;
+import com.error.UserCreatedException;
+import com.error.UserPassInvalid;
 import com.model.Phone;
 import com.model.User;
 import com.model.UserInn;
@@ -33,7 +36,7 @@ public class UserControllerTest extends TestCase {
     @Mock
     private UserController userController;
     @Mock
-    private UserService userService;
+    private UserServiceImpl userService;
     @Before
     public void init() {
 
@@ -53,5 +56,38 @@ public class UserControllerTest extends TestCase {
         assertEquals(response,responseExcepted);
     }
 
+    @Test
+    public void testNewUserNotOKInvalidEmail() {
+        //Arrange
+        UserInn userInn = new UserInn("userName","email@email.","Password12$",new Phone(12L,12,12345678));
+        when(userService.saveUser(userInn)).thenThrow(new InvalidMailException(userInn.getEmail()));
+        ResponseEntity responseExcepted = new ResponseEntity("Invalid Mail: email@email.", HttpStatus.FORBIDDEN);
+        //Act
+        ResponseEntity response = userController.newUser(userInn);
+        //Assert
+        assertEquals(response,responseExcepted);
+    }
 
+    @Test
+    public void testNewUserNotOKEmailAlreadyExist() {
+        //Arrange
+        UserInn userInn = new UserInn("userName","email@email.com","Password12$",new Phone(12L,12,12345678));
+        when(userService.saveUser(userInn)).thenThrow(new UserCreatedException(userInn.getEmail()));
+        ResponseEntity responseExcepted = new ResponseEntity("User email register in the database : email@email.com", HttpStatus.FORBIDDEN);
+        //Act
+        ResponseEntity response = userController.newUser(userInn);
+        //Assert
+        assertEquals(response,responseExcepted);
+    }
+    @Test
+    public void testNewUserNotOKUserPassInvalid() {
+        //Arrange
+        UserInn userInn = new UserInn("userName","email@email.com","Pas12$",new Phone(12L,12,12345678));
+        when(userService.saveUser(userInn)).thenThrow(new UserPassInvalid());
+        ResponseEntity responseExcepted = new ResponseEntity("User password invalid format", HttpStatus.FORBIDDEN);
+        //Act
+        ResponseEntity response = userController.newUser(userInn);
+        //Assert
+        assertEquals(response,responseExcepted);
+    }
 }

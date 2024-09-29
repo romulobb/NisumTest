@@ -9,8 +9,15 @@ import com.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 
 import java.util.UUID;
 
@@ -30,10 +37,15 @@ public class UserServiceImpl implements UserService{
         this.userRepository = userRepository;
     }
 
+
+    private static final String SECRET_KEY = "your_secret_key"; // Use a strong secret key
+    private static final long EXPIRATION_TIME = 600_000; // 10 minutes
+
+
     public User saveUser(UserInn userInn) {
 
         User userSaved=null;
-        String token=generateToken();
+
 
         if (!passValido(userInn.getPassword())){
             throw new UserPassInvalid();
@@ -44,6 +56,7 @@ public class UserServiceImpl implements UserService{
         if (!mailValido(userInn.getEmail())){
             throw new InvalidMailException(userInn.getEmail());}
         else{
+            String token=generateJWTToken(userInn.getName());
             userSaved  =new User(userInn.getName(),userInn.getEmail(),userInn.getPassword(),userInn.getPhone(),token);
             userRepository.save(userSaved);
         }
@@ -76,5 +89,27 @@ public class UserServiceImpl implements UserService{
         Pattern pattern = Pattern.compile(passwordPattern, Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(pass);
         return matcher.matches();
+    }
+
+    public static String generateJWTToken(String username ) {
+        return Jwts.builder()
+                .setSubject(username)
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
+                .compact();
+    }
+
+    public static String validateJWTToken(String token) {
+        try {
+            Claims claims = Jwts.parser()
+                    .setSigningKey(SECRET_KEY)
+                    .parseClaimsJws(token)
+                    .getBody();
+           // System.out.println("Token is valid. Username: " + claims.getSubject());
+            return claims.getSubject();
+        } catch (Exception e) {
+            //System.out.println("Invalid token: " + e.getMessage());
+            return "";
+        }
     }
 }
