@@ -2,6 +2,8 @@ package com.model;
 
 import lombok.Data;
 
+import java.util.List;
+
 
 @Data
 public class UserInn {
@@ -11,7 +13,7 @@ public class UserInn {
     private String name;
     private String email;
     private String password;
-    private Phone phone;
+    private List<PhoneInn> phones;
 
 
 
@@ -19,13 +21,13 @@ public class UserInn {
     public UserInn() {
     }
 
-    public UserInn(String name, String email, String password, Phone phone) {
+    public UserInn(String name, String email, String password, List<PhoneInn> phones) {
 
 
         this.name = name;
         this.email = email;
         this.password = password;
-        this.phone=phone;
+        this.phones = phones;
 
     }
 

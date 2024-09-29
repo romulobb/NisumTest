@@ -17,9 +17,6 @@ public class User {
     private String name;
     private String email;
     private String password;
-    private Long number;
-    private int citycode;
-    private int countrycode;
     private String token;
     private Date created;
     private Date lastLoguin;
@@ -31,15 +28,12 @@ public class User {
     public User() {
     }
 
-    public User(String name, String email, String password,Phone phone,String token) {
+    public User(String name, String email, String password,String token) {
         UUID uuid=UUID.randomUUID();
         this.id = uuid.toString();
         this.name = name;
         this.email = email;
         this.password = password;
-        this.number = phone.getNumber();
-        this.citycode = phone.getCitycode();
-        this.countrycode = phone.getCountrycode();
         this.created=new Date();
         this.lastLoguin=new Date();
         this.token=token;

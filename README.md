@@ -8,7 +8,9 @@ Se pude compilar el codigo en un entorno de desarrollo  como el eclipse,idea, et
 Esta clase lanza el servidor de SpringBoot, otro de los requerimientos. Esta configurado en el puerto por default, 8080
 
 Para acceder al Swagger, la url es http://localhost:8080/swagger-ui.html
-La url para listar los usuarios dados de Alta es http://localhost:8080/list
+La url para listar los usuarios dados de alta es http://localhost:8080/listUsers
+
+La url para listar los telefonos de los usuarios dados de alta es http://localhost:8080/listPhones
 
 la url para dar de alta nuevos usuarios es http://localhost:8080/registerUser
 
@@ -18,11 +20,18 @@ Un ejemplo de request de este Post es
 "email": "email@email.cl",
 "name": "nombre",
 "password": "Password12$",
-"phone": {
-    "citycode": 12,
-    "countrycode": 21,
-    "number": 123456
-    }
+"phones": [
+{
+"citycode": 121,
+"countrycode": 121,
+"number": 13451
+},
+{
+"citycode": 12222,
+"countrycode": 12221,
+"number": 13451231
+}
+]
 }
 
 Se entrega con Test Unitarios sobre la capa de Servicio y de Controlles, se pueden ejecutar a modo de prueba individual

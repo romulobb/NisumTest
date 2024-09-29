@@ -3,8 +3,11 @@ package com.service;
 import com.error.InvalidMailException;
 import com.error.UserCreatedException;
 import com.error.UserPassInvalid;
+import com.model.Phone;
+import com.model.PhoneInn;
 import com.model.User;
 import com.model.UserInn;
+import com.repositories.PhoneRepository;
 import com.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,22 +27,30 @@ import java.util.UUID;
 @Service
 public class UserServiceImpl implements UserService{
 
-    @Value("${password.pattern.regexp}")
-    public void setPasswordPattern(String passwordPattern){
-        this.passwordPattern=passwordPattern;
-    }
+    private static final String SECRET_KEY = "your_secret_key"; // Use a strong secret key
+    private static final long EXPIRATION_TIME = 600_000; // 10 minutes
+
+
     private String passwordPattern;
 
     private UserRepository userRepository;
+    private PhoneRepository phoneRepository;
 
     @Autowired
     public void setUserRepository(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
+    @Autowired
+    public void setPhoneRepository(PhoneRepository phoneRepository) {
+        this.phoneRepository = phoneRepository;
+    }
 
-    private static final String SECRET_KEY = "your_secret_key"; // Use a strong secret key
-    private static final long EXPIRATION_TIME = 600_000; // 10 minutes
+    @Value("${password.pattern.regexp}")
+    public void setPasswordPattern(String passwordPattern){
+        this.passwordPattern=passwordPattern;
+    }
+
 
 
     public User saveUser(UserInn userInn) {
@@ -57,8 +68,12 @@ public class UserServiceImpl implements UserService{
             throw new InvalidMailException(userInn.getEmail());}
         else{
             String token=generateJWTToken(userInn.getName());
-            userSaved  =new User(userInn.getName(),userInn.getEmail(),userInn.getPassword(),userInn.getPhone(),token);
+            userSaved  =new User(userInn.getName(),userInn.getEmail(),userInn.getPassword(),token);
             userRepository.save(userSaved);
+            for(PhoneInn phone:userInn.getPhones()){
+                Phone phoneSaved = new Phone(phone.getNumber(),phone.getCitycode(),phone.getCountrycode(),userInn.getEmail());
+                phoneRepository.save(phoneSaved);
+            }
         }
 
 
@@ -71,9 +86,9 @@ public class UserServiceImpl implements UserService{
     public Iterable<User> listAllUsers() {
         return userRepository.findAll();
     }
-    public String generateToken()
-    {   // por ahora lo genero con UUID, si llego, lo genero con JWT
-        return UUID.randomUUID().toString();
+    @Override
+    public Iterable<Phone> listAllPhones() {
+        return phoneRepository.findAll();
     }
 
     public boolean mailValido(String mail){
@@ -91,7 +106,7 @@ public class UserServiceImpl implements UserService{
         return matcher.matches();
     }
 
-    public static String generateJWTToken(String username ) {
+    public String generateJWTToken(String username ) {
         return Jwts.builder()
                 .setSubject(username)
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
@@ -99,16 +114,14 @@ public class UserServiceImpl implements UserService{
                 .compact();
     }
 
-    public static String validateJWTToken(String token) {
+    public String validateJWTToken(String token) {
         try {
             Claims claims = Jwts.parser()
                     .setSigningKey(SECRET_KEY)
                     .parseClaimsJws(token)
                     .getBody();
-           // System.out.println("Token is valid. Username: " + claims.getSubject());
             return claims.getSubject();
         } catch (Exception e) {
-            //System.out.println("Invalid token: " + e.getMessage());
             return "";
         }
     }

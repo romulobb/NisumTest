@@ -6,8 +6,10 @@ import com.error.UserCreatedException;
 import com.error.UserPassInvalid;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.model.Phone;
+import com.model.PhoneInn;
 import com.model.User;
 import com.model.UserInn;
+import com.repositories.PhoneRepository;
 import com.repositories.UserRepository;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,6 +21,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
@@ -36,13 +41,19 @@ public class UserServiceImplTest {
     private UserServiceImpl userService;
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private PhoneRepository phoneRepository;
     @Before
     public void init() {
-            User user = new User("UserName", "user@email.cl","Password12$",new Phone(12L,12,12345678),"qwerwqerwqer");
+         //   List<PhoneInn> phones = new ArrayList<>();
+        //    phones.add(new PhoneInn(12L,12,12345678));
+        //    UserInn userInn = new UserInn("userName","email@email.cl","Password12$",phones);
+            User user = new User("UserName", "user@email.cl","Password12$","qwerwqerwqer");
             when(userRepository.findByEmail("user@email.cl")).thenReturn(user);
             MockitoAnnotations.initMocks(this);
             userService=new UserServiceImpl();
             userService.setUserRepository(userRepository);
+            userService.setPhoneRepository(phoneRepository);
             userService.setPasswordPattern("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,20}$");
     }
     @Test
@@ -68,10 +79,12 @@ public class UserServiceImplTest {
     @Test
     public void testSaveUserOk() {
         // Arrange
-        User user = new User("UserName", "user@email.cl","Password12$",new Phone(12L,12,12345678),"qwerwqerwqer");
+        User user = new User("UserName", "user@email.cl","Password12$","qwerwqerwqer");
         when(userRepository.save(user)).thenReturn(user);
         // Act
-        UserInn userInn = new UserInn("UserName","user@email.cl","Password12$",new Phone(12L,12,12345678));
+        List<PhoneInn> phones = new ArrayList<>();
+        phones.add(new PhoneInn(12L,12,12345678));
+        UserInn userInn = new UserInn("UserName","user@email.cl","Password12$",phones);
         User retrievedUser = userService.saveUser(userInn);
         // Assert
 
@@ -81,10 +94,12 @@ public class UserServiceImplTest {
     @Test
     public void testSaveUserNotOkMalformedMail() {
         // Arrange
-        User user = new User("UserName", "user@email.cl","Password12$",new Phone(12L,12,12345678),"qwerwqerwqer");
+        User user = new User("UserName", "user@email.cl","Password12$","qwerwqerwqer");
         when(userRepository.save(user)).thenReturn(user);
         // Act
-        UserInn userInn = new UserInn("UserName","useremail.cl","Password12$",new Phone(12L,12,12345678));
+        List<PhoneInn> phones = new ArrayList<>();
+        phones.add(new PhoneInn(12L,12,12345678));
+        UserInn userInn = new UserInn("UserName","useremail.cl","Password12$",phones);
         User retrievedUser=new User();
         try {
             retrievedUser = userService.saveUser(userInn);
@@ -99,10 +114,12 @@ public class UserServiceImplTest {
     @Test
     public void testSaveUserNotOkBadPassword() {
         // Arrange
-        User user = new User("UserName", "user@email.cl","Password12$",new Phone(12L,12,12345678),"qwerwqerwqer");
+        User user = new User("UserName", "user@email.cl","Password12$","qwerwqerwqer");
         when(userRepository.save(user)).thenReturn(user);
         // Act
-        UserInn userInn = new UserInn("UserName","user@email.cl","Pass12$",new Phone(12L,12,12345678));
+        List<PhoneInn> phones = new ArrayList<>();
+        phones.add(new PhoneInn(12L,12,12345678));
+        UserInn userInn = new UserInn("UserName","user@email.cl","Pass12$",phones);
         User retrievedUser=new User();
         try {
             retrievedUser = userService.saveUser(userInn);
@@ -116,11 +133,13 @@ public class UserServiceImplTest {
     @Test
     public void testSaveUserAlreadyCreated() {
         // Arrange
-        User user = new User("UserName", "user@email.cl","Password12$",new Phone(12L,12,12345678),"qwerwqerwqer");
+        User user = new User("UserName", "user@email.cl","Password12$","qwerwqerwqer");
         when(userRepository.save(user)).thenReturn(user);
 
         // Act
-        UserInn userInn = new UserInn("UserName","user@email.cl","Password12$",new Phone(12L,12,12345678));
+        List<PhoneInn> phones = new ArrayList<>();
+        phones.add(new PhoneInn(12L,12,12345678));
+        UserInn userInn = new UserInn("UserName","user@email.cl","Password12$",phones);
         User retrievedUser=new User();
         try {
             retrievedUser = userService.saveUser(userInn);

@@ -3,6 +3,7 @@ package com.controllers;
 import com.error.InvalidMailException;
 import com.error.UserCreatedException;
 import com.error.UserPassInvalid;
+import com.model.Phone;
 import com.model.User;
 import com.model.UserInn;
 import com.service.UserService;
@@ -41,11 +42,15 @@ public class UserController {
 
     }
 
-    @RequestMapping(value = "/list", method= RequestMethod.GET, produces = "application/json")
-    public Iterable<User> list(){
+    @RequestMapping(value = "/listUsers", method= RequestMethod.GET, produces = "application/json")
+    public Iterable<User> listUsers(){
 
         return  service.listAllUsers();
     }
 
+    @RequestMapping(value = "/listPhones", method= RequestMethod.GET, produces = "application/json")
+    public Iterable<Phone> listPhones(){
+        return  service.listAllPhones();
+    }
 
 }
