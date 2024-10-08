@@ -58,3 +58,28 @@ desde donde se configura, por medio de una expresion regular
 
 El correo, puede contener cualquier dominio, pero debe finalizar con .cl
 
+Feedback ejercicio técnico: 
+
+
+FEEDBACK EQUIPO TECNICO
+
+No cumple con:
+
+Manejo de DTOs
+Subir código comentado al repositorio
+Dejar imports sin usar
+Encontrar todos los componentes en una misma carpeta
+Creación de la funcionalidad de login (Opcional)
+Creación de Token como mecanismo de securitización de la API
+
+Comentarios adicionales:
+
+Readme.md con faltas de ortografía y puntuaciones.
+Usa java.util.Date en vez de la api java.time para controlar fechas.
+Almacenamiento incorrecto de fecha y hora en BBDD.
+Declara clases con múltiples comportamientos, sin separación por funciones.
+Manejo correcto de excepciones.
+No implementa seguridad para acceder a la API.
+Implementa base de datos H2, pero no la configura completamente.
+Mensajes de validaciones y errores no cumplen con el formato solicitado
+Implementa pruebas unitarias.
